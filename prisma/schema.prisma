@@ -1,0 +1,39 @@
+generator client { provider = "prisma-client-js" }
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  entries   Entry[]
+  insights  Insight[]
+}
+
+model Entry {
+  id        String   @id @default(cuid())
+  userId    String
+  kind      String   // "morning" | "evening" | "note"
+  content   Json
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Insight {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @default(now())
+  body      Json     // {microHabit, reframing, worldTrend}
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Rule {
+  id      String @id @default(cuid())
+  tag     String
+  pattern String
+  payload Json
+}
